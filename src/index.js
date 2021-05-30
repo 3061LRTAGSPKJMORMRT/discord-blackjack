@@ -269,7 +269,6 @@ module.exports = async (message, client) => {
                             if (dealCard.rank != "A") {
                                 endtrue = true
                                 responsenow = "s"
-                                value = value + dealCard.value
                             } else {
                                 addco = "Soft "
                             }
@@ -337,11 +336,10 @@ module.exports = async (message, client) => {
                         }
                     }
                     yourcontent.push(`${dealCard.emoji} ${dealCard.rank}`)
-                    normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
+                    normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value+dealCard.value}\``
                     ori = message.channel.send(normalcontent, { embed: normalembed })
                     let endtrue = false
-                    value = value + dealCard.value
-                    if (value >= 21) {
+                    if (value + dealCard.value >= 21) {
                         if (addco == "Soft ") {
                             addco = ""
                             let usu = 0
@@ -360,6 +358,7 @@ module.exports = async (message, client) => {
                             }
                         }
                     }
+                    value = value + dealCard.value
                     startAt++
                     if (endtrue == false) {
                         responsenow = "h"
