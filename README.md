@@ -1,9 +1,6 @@
 # Discord Blackjack
 A NPM Package for blackjack games in Discord!
 
-# IMPORTANT NOTICE
-This package does have bugs. Usually if an error occurs, an error embed with the link to the support server is given. The return value given will also be `ERROR`. You can state issues and suggestions as well as create a pull request as that would be very handy!
-
 ## Easy setup and use
 
 ### Installtion
