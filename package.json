@@ -1,0 +1,27 @@
+{
+  "name": "discord-blackjack",
+  "version": "1.0.0",
+  "description": "A blackjack game for Discord",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/3061LRTAGSPKJMORMRT/discord-blackjack"
+  },
+  "keywords": [
+    "discord",
+    "discord.js",
+    "blackjack",
+    "bg",
+    "discord-blackjack",
+    "discord.js-blackjack"
+  ],
+  "author": "Ashish Emmanuel",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "shuffle-array": "^1.0.1"
+  }
+}
