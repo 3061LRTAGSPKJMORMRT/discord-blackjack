@@ -190,7 +190,7 @@ module.exports = async (message, client) => {
     let noResEmbed = new Discord.MessageEmbed()
         .setAuthor(usertag, avatar)
         .setTitle(`Game Ended`)
-        .setDescription(`**${message.author.username}, your Game has Ended due to 1 Minute of Inactivity.**`)
+        .setDescription(`**${message.author.username}, your Game has Ended due to 30 seconds of Inactivity.**`)
         .setColor("RANDOM")
 
     let normalcontent = `Type \`h\` to draw a card or type \`s\` to stand.`
@@ -233,7 +233,7 @@ module.exports = async (message, client) => {
     }
 
 
-    let ori = await message.channel.send(content, { embed: normalembed })
+    let ori = message.channel.send(content, { embed: normalembed })
     await message.channel.awaitMessages(filter, { max: 1, time: 30000 }).then(
         async allresponses => {
             if (!allresponses.size) {
@@ -252,19 +252,17 @@ module.exports = async (message, client) => {
                         }
                     }
                     yourcontent.push(`${dealCard.emoji} ${dealCard.rank}`)
-                    normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value+dealCard.value}\``
-                    ori = message.channel.send(normalcontent, { embed: normalembed })
                     let endtrue = false
                     if (value + dealCard.value >= 21) {
+                        console.log(`addco: "${addco}"`)
                         if (addco == "Soft ") {
                             addco = ""
-                            let usu = 0
-                            yourdeck.forEach(e => {
-                                if (e.rank == "A") {
-                                    yourdeck[usu].value = 1
+                            for (let e = 0 ; e < yourdeck.length ; e++) {
+                                if (yourdeck[e] == "A") {
+                                    yourdeck[e].value = 1
+                                    value = value - 10
                                 }
-                                usu++
-                            })
+                            }
                         } else {
                             if (dealCard.rank != "A") {
                                 endtrue = true
@@ -275,6 +273,8 @@ module.exports = async (message, client) => {
                         }
 
                     }
+                    normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value+dealCard.value}\``
+                    ori = message.channel.send(normalcontent, { embed: normalembed })
                     value = value + dealCard.value
                     startAt++
                     if (endtrue == false) {
@@ -336,16 +336,16 @@ module.exports = async (message, client) => {
                         }
                     }
                     yourcontent.push(`${dealCard.emoji} ${dealCard.rank}`)
-                    normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value+dealCard.value}\``
-                    ori = message.channel.send(normalcontent, { embed: normalembed })
                     let endtrue = false
                     if (value + dealCard.value >= 21) {
+                        console.log(`Addco: ${addco}`)
                         if (addco == "Soft ") {
                             addco = ""
                             let usu = 0
                             yourdeck.forEach(e => {
                                 if (e.rank == "A") {
                                     yourdeck[usu].value = 1
+                                    value = value - 10
                                 }
                                 usu++
                             })
@@ -358,6 +358,8 @@ module.exports = async (message, client) => {
                             }
                         }
                     }
+                    normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value+dealCard.value}\``
+                    ori = message.channel.send(normalcontent, { embed: normalembed })
                     value = value + dealCard.value
                     startAt++
                     if (endtrue == false) {
