@@ -51,7 +51,7 @@ module.exports = async (message, client) => {
     games.add(message.author.id)
 
     let DECK = [
-        { suit: 'clubs', rank: 'Ace', value: [1, 11], emoji: "♣️" },
+        { suit: 'clubs', rank: 'A', value: [1, 11], emoji: "♣️" },
         { suit: 'clubs', rank: '2', value: 2, emoji: "♣️" },
         { suit: 'clubs', rank: '3', value: 3, emoji: "♣️" },
         { suit: 'clubs', rank: '4', value: 4, emoji: "♣️" },
@@ -61,9 +61,9 @@ module.exports = async (message, client) => {
         { suit: 'clubs', rank: '8', value: 8, emoji: "♣️" },
         { suit: 'clubs', rank: '9', value: 9, emoji: "♣️" },
         { suit: 'clubs', rank: '10', value: 10, emoji: "♣️" },
-        { suit: 'clubs', rank: 'Jack', value: 10, emoji: "♣️" },
-        { suit: 'clubs', rank: 'Queen', value: 10, emoji: "♣️" },
-        { suit: 'clubs', rank: 'King', value: 10, emoji: "♣️" },
+        { suit: 'clubs', rank: 'J', value: 10, emoji: "♣️" },
+        { suit: 'clubs', rank: 'Q', value: 10, emoji: "♣️" },
+        { suit: 'clubs', rank: 'K', value: 10, emoji: "♣️" },
 
         { suit: 'diamonds', rank: 'A', value: [1, 11], emoji: "️️️️️️♦️" },
         { suit: 'diamonds', rank: '2', value: 2, emoji: "♦️" },
@@ -399,7 +399,8 @@ module.exports = async (message, client) => {
             startAt++
         }
         responsenow = "INVALID"
-        if (value > 21) {
+        console.log(`Value: ${value}\nDvalue: ${dvalue}`)
+        if (value > 21 || (dvalue <= 21 && value < dvalue)) {
             loseembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
             loseembed.fields[1].value = `Cards: [\`${dealercontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${dvalue}\``
             message.channel.send({ embed: loseembed })
