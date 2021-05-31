@@ -45,7 +45,7 @@ client.login(token)
 
 ### Command Handler
 ```js
-const blackjack = require("blackjack")
+const blackjack = require("discord-blackjack")
 
 module.exports = {
   name: "blackjack",
