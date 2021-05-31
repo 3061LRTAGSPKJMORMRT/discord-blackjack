@@ -22,20 +22,26 @@ client.on("ready", () => {
   })
  
 client.on("message", async message => {
-  if (message.author.bot || !message.content.startsWith("prefix")) return
+  if (message.author.bot || !message.content.startsWith(prefix)) return
  
   if (message.content == `${prefix}blackjack` || message.content == `${prefix}bj`) {
     let result = await blackjack(message, client)
-    if (result == "Win") {
-       // do win stuff here
-    } else if (result == "Tie") {
+    switch (result) {
+      case 'Win':
+        // do win stuff here
+        break
+      case 'Tie':
         // do tie stuff here
-    } else if (result == "Lose") {
+        break
+      case 'Lose':
         // do lose stuff here
-    } else if (result == "Double Win") {
-        // do double-down here
-    } else if (result == "ERROR") {
+        break
+      case 'Double Win':
+        // do double win stuff here
+        break
+      case 'ERROR':
         // do whatever you want
+        break
     }
    }
  }
@@ -52,18 +58,23 @@ module.exports = {
   async execute(message, args, client) {
 
     let result = await blackjack(message, client)
-    if (result == "Win") {
-       // do win stuff here
-    } else if (result == "Tie") {
+    switch (result) {
+      case 'Win':
+        // do win stuff here
+        break
+      case 'Tie':
         // do tie stuff here
-    } else if (result == "Lose") {
+        break
+      case 'Lose':
         // do lose stuff here
-    } else if (result == "Double Win") {
-        // do double-down here
-    } else if (result == "ERROR") {
+        break
+      case 'Double Win':
+        // do double win stuff here
+        break
+      case 'ERROR':
         // do whatever you want
+        break
     }
-
   }
 }
 ```
