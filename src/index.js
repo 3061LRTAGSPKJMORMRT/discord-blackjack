@@ -254,7 +254,6 @@ module.exports = async (message, client) => {
                     yourcontent.push(`${dealCard.emoji} ${dealCard.rank}`)
                     let endtrue = false
                     if (value + dealCard.value >= 21) {
-                        console.log(`addco: "${addco}"`)
                         if (addco == "Soft ") {
                             addco = ""
                             for (let e = 0 ; e < yourdeck.length ; e++) {
@@ -338,7 +337,6 @@ module.exports = async (message, client) => {
                     yourcontent.push(`${dealCard.emoji} ${dealCard.rank}`)
                     let endtrue = false
                     if (value + dealCard.value >= 21) {
-                        console.log(`Addco: ${addco}`)
                         if (addco == "Soft ") {
                             addco = ""
                             let usu = 0
@@ -401,7 +399,6 @@ module.exports = async (message, client) => {
             startAt++
         }
         responsenow = "INVALID"
-        console.log(`Value: ${value}\nDvalue: ${dvalue}`)
         if (value > 21 || (dvalue <= 21 && value < dvalue)) {
             loseembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
             loseembed.fields[1].value = `Cards: [\`${dealercontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${dvalue}\``
