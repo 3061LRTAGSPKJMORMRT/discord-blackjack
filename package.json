@@ -1,6 +1,6 @@
 {
   "name": "discord-blackjack",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "description": "A blackjack game for Discord",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,11 @@
     "type": "git",
     "url": "https://github.com/3061LRTAGSPKJMORMRT/discord-blackjack"
   },
+  "funding": {
+    "type": "individual",
+    "url": "https://ko-fi.com/3061lrtagspkjmormrt"
+  },
+  "homepage": "https://17ashishemmanuel.gitbook.io/discord-blackjack/options",
   "keywords": [
     "discord",
     "discord.js",
