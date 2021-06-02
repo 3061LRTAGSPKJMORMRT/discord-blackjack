@@ -257,7 +257,7 @@ module.exports = async (message, client) => {
                         if (addco == "Soft ") {
                             addco = ""
                             for (let e = 0 ; e < yourdeck.length ; e++) {
-                                if (yourdeck[e] == "A") {
+                                if (yourdeck[e].rank == "A") {
                                     yourdeck[e].value = 1
                                     value = value - 10
                                 }
@@ -310,11 +310,12 @@ module.exports = async (message, client) => {
 
     while (responsenow == "split") {
         let deletedi = yourdeck.pop()
-        v = v - deletedi
+        value = value - deletedi.value
         yourrank.pop()
         yourcontent.pop()
+        normalembed.fields[0].value = `Cards: [\`${yourcontent.join("\`](https://google.com) [\`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
         ori = message.channel.send(normalcontent, { embed: normalembed })
-        responsenow = "s"
+        responsenow = "h"
     }
 
     while (responsenow == "h") {
@@ -332,6 +333,7 @@ module.exports = async (message, client) => {
                             dealCard.value = 1
                         } else {
                             dealCard.value = 11
+                            addco = "Soft "
                         }
                     }
                     yourcontent.push(`${dealCard.emoji} ${dealCard.rank}`)
@@ -339,14 +341,13 @@ module.exports = async (message, client) => {
                     if (value + dealCard.value >= 21) {
                         if (addco == "Soft ") {
                             addco = ""
-                            let usu = 0
-                            yourdeck.forEach(e => {
-                                if (e.rank == "A") {
+                            for (let usu = 0 ; usu < yourdeck.length ; usu++) {
+                                if (yourdeck[usu].rank == "A") {
                                     yourdeck[usu].value = 1
                                     value = value - 10
                                 }
-                                usu++
-                            })
+                            }
+                            
                         } else {
                             if (dealCard.rank != "A") {
                                 endtrue = true
@@ -404,6 +405,9 @@ module.exports = async (message, client) => {
             loseembed.fields[1].value = `Cards: [\`${dealercontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${dvalue}\``
             message.channel.send({ embed: loseembed })
             RESULTS = "Lose"
+            if (doubledtrue == true) {
+                RESULTS = "Double Lose"
+            }
         } else if (value == 21 || value > dvalue || dvalue > 21) {
             winembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
             winembed.fields[1].value = `Cards: [\`${dealercontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${dvalue}\``
