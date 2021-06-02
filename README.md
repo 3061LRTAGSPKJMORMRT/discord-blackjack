@@ -88,14 +88,14 @@ module.exports = {
 ## Result
 The results that will be returned once the game ends
 
-`Win` - Returns this if a player wins the game
-`Lose` - Returns this if a player loses the game
-`Double Win` - Returns this if a player wins the game using double down
-`Double Lose` - Returns this if a player loses the game because of double down
-`Tie` - Returns this if a tie happened
-`Timeout` - Returns this if no answer was provided in 30 seconds
-`Cancel`- Returns this if they decided to cancel the game
-`ERROR` - Returns this if an error occured. Please report this to Ashish#0540 immediately
+`Win` - Returns this if a player wins the game<br>
+`Lose` - Returns this if a player loses the game<br>
+`Double Win` - Returns this if a player wins the game using double down<br>
+`Double Lose` - Returns this if a player loses the game because of double down<br>
+`Tie` - Returns this if a tie happened<br>
+`Timeout` - Returns this if no answer was provided in 30 seconds<br>
+`Cancel`- Returns this if they decided to cancel the game<br>
+`ERROR` - Returns this if an error occured. Please report this to Ashish#0540 immediately<br>
 
 ### Output:
 <img src="https://media.discordapp.net/attachments/842065905529651201/848458284222382081/unknown.png?width=278&height=473" alt="Welp, this image couldn't load...">
