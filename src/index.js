@@ -44,6 +44,7 @@ module.exports = async (message, client, options) => {
         content: "",
         value: ""
     }
+    let method = "None"
     if (!message) throw new Error("[DETAILS_NOT_PROVIDED]: The Message Object was not provided!")
     if (!client) throw new Error("[DETAILS_NOT_PROVIDED]: The Discord Client Object was not provided!")
     if (!options) options = {}
@@ -257,6 +258,7 @@ module.exports = async (message, client, options) => {
         }
 
         let ori = message.channel.send(content, { embed: normalembed })
+        normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.value, `{yvalue}`)
         await message.channel.awaitMessages(filter, { max: 1, time: 30000 }).then(
             async allresponses => {
                 if (!allresponses.size) {
@@ -274,11 +276,12 @@ module.exports = async (message, client, options) => {
                                 addco = "Soft "
                             }
                         }
+                        value = value + dealCard.value
                         yourcontent.push(`${dealCard.emoji} ${dealCard.rank}`)
                         yourrank.push(dealCard.rank)
                         youremoji.push(dealCard.emoji)
                         let endtrue = false
-                        if (value + dealCard.value >= 21) {
+                        if (value >= 21) {
                             if (addco == "Soft ") {
                                 addco = ""
                                 for (let e = 0; e < yourdeck.length; e++) {
@@ -298,17 +301,21 @@ module.exports = async (message, client, options) => {
 
                         }
                         if (options.normalEmbed == true) {
-                            normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value + dealCard.value}\``
+                            normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
                         } else {
-                            normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.content, `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`).replace(copiedEmbed.value, `${addco}${value + dealCard.value}`)
+                            normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.content, `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`).replace(`{yvalue}`, `${addco}${value}`)
                             copiedEmbed.content = `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`
-                            copiedEmbed.value = `${addco}${value + dealCard.value}`
+                            copiedEmbed.value = `${addco}${value}`
                         }
                         ori = message.channel.send(normalcontent, { embed: normalembed })
-                        value = value + dealCard.value
+                        normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.value, `{yvalue}`)
                         startAt++
                         if (endtrue == false) {
-                            responsenow = "h"
+                            if (value >= 21) {
+                                responsenow = "s"
+                            } else {
+                                responsenow = "h"
+                            }
                         }
                     } else if (["e", "en", "end"].includes(theanswer)) {
                         responsenow = "cancel"
@@ -350,11 +357,12 @@ module.exports = async (message, client, options) => {
             if (options.normalEmbed == true) {
                 normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
             } else {
-                normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.content, `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`).replace(copiedEmbed.value, `${addco}${value}`)
+                normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.content, `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`).replace(`{yvalue}`, `${addco}${value}`)
                 copiedEmbed.content = `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`
                 copiedEmbed.value = `${addco}${value}`
             }
             ori = message.channel.send(normalcontent, { embed: normalembed })
+            normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.value, `{yvalue}`)
             responsenow = "h"
         }
 
@@ -376,17 +384,18 @@ module.exports = async (message, client, options) => {
                                 addco = "Soft "
                             }
                         }
+                        value = value + dealCard.value
                         yourcontent.push(`${dealCard.emoji} ${dealCard.rank}`)
                         yourrank.push(dealCard.rank)
                         youremoji.push(dealCard.emoji)
                         let endtrue = false
-                        if (value + dealCard.value >= 21) {
+                        if (value >= 21) {
                             if (addco == "Soft ") {
                                 addco = ""
                                 for (let usu = 0; usu < yourdeck.length; usu++) {
                                     if (yourdeck[usu].rank == "A") {
                                         yourdeck[usu].value = 1
-                                        value = value - 10 + dealCard.value
+                                        value = value - 10
                                     }
                                 }
 
@@ -400,20 +409,21 @@ module.exports = async (message, client, options) => {
                             }
                         }
                         if (options.normalEmbed == true) {
-                            normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value + dealCard.value}\``
+                            normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
                         } else {
-                            normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.content, `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`).replace(copiedEmbed.value, `${addco}${value + dealCard.value}`)
+                            normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.content, `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`).replace(`{yvalue}`, `${addco}${value}`)
                             copiedEmbed.content = `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`
-                            copiedEmbed.value = `${addco}${value + dealCard.value}`
+                            copiedEmbed.value = `${addco}${value}`
                         }
                         ori = message.channel.send(normalcontent, { embed: normalembed })
-                        value = value + dealCard.value
+                        normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.value, `{yvalue}`)
                         startAt++
                         if (endtrue == false) {
                             if (value >= 21) {
                                 responsenow = "s"
+                            } else {
+                                responsenow = "h"
                             }
-                            responsenow = "h"
                         }
                     } else if (["e", "end", "en"].includes(theanswer)) {
                         responsenow = "cancel"
@@ -452,8 +462,15 @@ module.exports = async (message, client, options) => {
                 startAt++
             }
             responsenow = "INVALID"
+            
             if (value > 21 || (dvalue <= 21 && value < dvalue)) {
-
+                if (value > 21) {
+                    method = "Busted"
+                } else if (dvalue == 21) {
+                    method = "Dealer reached 21"
+                } else {
+                    method = "Dealer had more"
+                }
                 loseembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
                 loseembed.fields[1].value = `Cards: [\`${dealercontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${dvalue}\``
                 if (options.resultEmbed == true) {
@@ -464,6 +481,13 @@ module.exports = async (message, client, options) => {
                     RESULTS = "Double Lose"
                 }
             } else if (value == 21 || value > dvalue || dvalue > 21) {
+                if (value == 21) {
+                    method = "Blackjack"
+                } else if (dvalue > 21) {
+                    method = "Dealer Bust"
+                } else {
+                    method = "Player had more"
+                }
                 winembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
                 winembed.fields[1].value = `Cards: [\`${dealercontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${dvalue}\``
                 if (options.resultEmbed == true) {
@@ -474,6 +498,7 @@ module.exports = async (message, client, options) => {
                     RESULTS = "Double Win"
                 }
             } else if (value == dvalue) {
+                method = "Tie"
                 tieembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
                 tieembed.fields[1].value = `Cards: [\`${dealercontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${dvalue}\``
                 if (options.resultEmbed == true) {
@@ -515,7 +540,8 @@ module.exports = async (message, client, options) => {
 
         let FINALRESULTS = {
             result: RESULTS,
-            yvalue: value,
+            method: method,
+            yvalue: `${addco}${value}`,
             dvalue: dvalue,
             ycontent: `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`,
             dcontent: `[\`${dealercontent.join("`](https://google.com)   [`")}\`](https://google.com)`,
