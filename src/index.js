@@ -22,7 +22,8 @@ const games = new Set();
     *   if (message.author.bot || !message.content.startsWith("prefix")) return
     * 
     *   if (message.content == `${prefix}blackjack` || message.content == `${prefix}bj`) {
-    *       let result = await blackjack(message, client)
+    *       let game = await blackjack(message, client)
+    *       let result = game.result
     *       if (result == "Win") {
     *           // do win stuff here
     *       } else if (result == "Tie") {
@@ -57,10 +58,11 @@ module.exports = async (message, client, options) => {
         if (!options.normalEmbedContent) throw new Error("[DETAILS_NOT_PROVIDED]: The Embed object was not provided!")
         normalembed = options.normalEmbedContent
     }
-    if (!message.id || !message.channel || !message.channel.id || !message.author) throw new Error("[INVALID_DETAILS]: The Message Object was invalid!")
-    if (!client.user.id || !client.user) throw new Error("[INVALID_DETAILS]: The Discord Client Object was invalid!")
+    if (!(message instanceof Discord.Message)) throw new Error("[INVALID_DETAILS]: The Message Object was invalid!")
+    if (!(client instanceof Discord.Client)) throw new Error("[INVALID_DETAILS]: The Discord Client Object was invalid!")
+    if (Discord.version.split(".").map(Number).slice(0, 3)[0] < 13) throw new Error("[INVALID_DISCORD_VERSION]: The Discord.JS version has to be 13 or higher! Please use version 2.0.4 or lower for v12!")
     if (!message.guild || !message.guild.me) throw new TypeError("[WRONG_USAGE]: This cannot be used in DMs!")
-    
+
     if (games.has(message.author.id)) {
         return message.channel.send("You are already playing a game!")
     }
@@ -124,7 +126,7 @@ module.exports = async (message, client, options) => {
             { suit: 'spades', rank: 'K', value: 10, emoji: "♠️" },
         ];
 
-        let RESULTS = ""
+        let RESULTS = "Unknown"
 
         let NEWDECKS = shuffle(DECK)
 
@@ -237,12 +239,19 @@ module.exports = async (message, client, options) => {
 
         let responsenow = "h"
 
-        if (value == 21 && addco != "Soft ") {
+        if (value == 21) {
+            responsenow = "s"
             if (dvalue == 21) {
-                message.channel.send({ embed: tieembed })
+                if (options.resultEmbed == true) {
+                    message.channel.send({ embeds: [tieembed] })
+                }
+                method = "Tie"
                 RESULTS = "Tie"
             } else {
-                message.channel.send({ embed: winembed })
+                if (options.resultEmbed == true) {
+                    message.channel.send({ embeds: [winembed] })
+                }
+                method = "Blackjack"
                 RESULTS = "Win"
             }
         }
@@ -257,78 +266,84 @@ module.exports = async (message, client, options) => {
             }
         }
 
-        let ori = message.channel.send(content, { embed: normalembed })
-        normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.value, `{yvalue}`)
-        await message.channel.awaitMessages(filter, { max: 1, time: 30000 }).then(
-            async allresponses => {
-                if (!allresponses.size) {
-                    responsenow = "timeout"
-                } else {
-                    let theanswer = String(allresponses.first()).toLowerCase()
-                    if (["h", "hit", "hi"].includes(theanswer)) {
-                        let dealCard = NEWDECKS[startAt - 1]
-                        yourdeck.push(dealCard)
-                        if (dealCard.rank == "A") {
-                            if (yourrank.includes("A")) {
-                                dealCard.value = 1
-                            } else {
-                                dealCard.value = 11
-                                addco = "Soft "
-                            }
-                        }
-                        value = value + dealCard.value
-                        yourcontent.push(`${dealCard.emoji} ${dealCard.rank}`)
-                        yourrank.push(dealCard.rank)
-                        youremoji.push(dealCard.emoji)
-                        let endtrue = false
-                        if (value >= 21) {
-                            if (addco == "Soft ") {
-                                addco = ""
-                                for (let e = 0; e < yourdeck.length; e++) {
-                                    if (yourdeck[e].rank == "A") {
-                                        yourdeck[e].value = 1
-                                        value = value - 10
-                                    }
-                                }
-                            } else {
-                                if (dealCard.rank != "A") {
-                                    endtrue = true
-                                    responsenow = "s"
+        if (RESULTS == "Unknown") {
+            let ori = message.channel.send({ content: content, embeds: [normalembed] })
+            normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.value, `{yvalue}`)
+            await message.channel.awaitMessages({filter: filter, max: 1, time: 30000 }).then(
+                async allresponses => {
+                    if (!allresponses.size) {
+                        responsenow = "timeout"
+                    } else {
+                        let theanswer = String(allresponses.first()).toLowerCase()
+                        if (["h", "hit", "hi"].includes(theanswer)) {
+                            let dealCard = NEWDECKS[startAt - 1]
+                            yourdeck.push(dealCard)
+                            if (dealCard.rank == "A") {
+                                if (yourrank.includes("A")) {
+                                    dealCard.value = 1
                                 } else {
+                                    dealCard.value = 11
                                     addco = "Soft "
                                 }
                             }
-
-                        }
-                        if (options.normalEmbed == true) {
-                            normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
-                        } else {
-                            normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.content, `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`).replace(`{yvalue}`, `${addco}${value}`)
-                            copiedEmbed.content = `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`
-                            copiedEmbed.value = `${addco}${value}`
-                        }
-                        ori = message.channel.send(normalcontent, { embed: normalembed })
-                        normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.value, `{yvalue}`)
-                        startAt++
-                        if (endtrue == false) {
+                            value = value + dealCard.value
+                            yourcontent.push(`${dealCard.emoji} ${dealCard.rank}`)
+                            yourrank.push(dealCard.rank)
+                            youremoji.push(dealCard.emoji)
+                            let endtrue = false
                             if (value >= 21) {
-                                responsenow = "s"
-                            } else {
-                                responsenow = "h"
+                                if (addco == "Soft ") {
+                                    addco = ""
+                                    for (let e = 0; e < yourdeck.length; e++) {
+                                        if (yourdeck[e].rank == "A") {
+                                            yourdeck[e].value = 1
+                                            value = value - 10
+                                        }
+                                    }
+                                } else {
+                                    if (dealCard.rank != "A") {
+                                        endtrue = true
+                                        responsenow = "s"
+                                    } else {
+                                        addco = "Soft "
+                                    }
+                                }
+
                             }
+
+                            if (endtrue == false) {
+                                if (value >= 21) {
+                                    responsenow = "s"
+                                } else {
+                                    responsenow = "h"
+                                }
+                            }
+
+                            if (responsenow != "s") {
+                                if (options.normalEmbed == true) {
+                                    normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
+                                } else {
+                                    normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.content, `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`).replace(`{yvalue}`, `${addco}${value}`)
+                                    copiedEmbed.content = `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`
+                                    copiedEmbed.value = `${addco}${value}`
+                                }
+                                ori = message.channel.send({ content: normalcontent, embeds: [normalembed] })
+                                normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.value, `{yvalue}`)
+                            }
+                            startAt++
+                        } else if (["e", "en", "end"].includes(theanswer)) {
+                            responsenow = "cancel"
+                        } else if (["s", "st", "sta", "stan", "stand"].includes(theanswer)) {
+                            responsenow = "s"
+                        } else if (["dd", "double-down", "double down", "d"].includes(theanswer)) {
+                            responsenow = "dd"
+                        } else if (["sp", "spl", "spli", "split"].includes(theanswer)) {
+                            responsenow = "split"
                         }
-                    } else if (["e", "en", "end"].includes(theanswer)) {
-                        responsenow = "cancel"
-                    } else if (["s", "st", "sta", "stan", "stand"].includes(theanswer)) {
-                        responsenow = "s"
-                    } else if (["dd", "double-down", "double down", "d"].includes(theanswer)) {
-                        responsenow = "dd"
-                    } else if (["sp", "spl", "spli", "split"].includes(theanswer)) {
-                        responsenow = "split"
                     }
                 }
-            }
-        )
+            )
+        }
 
         while (responsenow == "dd") {
             doubledtrue = true
@@ -361,14 +376,14 @@ module.exports = async (message, client, options) => {
                 copiedEmbed.content = `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`
                 copiedEmbed.value = `${addco}${value}`
             }
-            ori = message.channel.send(normalcontent, { embed: normalembed })
+            ori = message.channel.send({ content: normalcontent, embeds: [normalembed] })
             normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.value, `{yvalue}`)
             responsenow = "h"
         }
 
         while (responsenow == "h") {
 
-            await message.channel.awaitMessages(filter1, { max: 1, time: 30000 }).then(async allresponses => {
+            await message.channel.awaitMessages({filter: filter1, max: 1, time: 30000 }).then(async allresponses => {
                 if (!allresponses.size) {
                     responsenow = "timeout"
                 } else {
@@ -408,16 +423,6 @@ module.exports = async (message, client, options) => {
                                 }
                             }
                         }
-                        if (options.normalEmbed == true) {
-                            normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
-                        } else {
-                            normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.content, `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`).replace(`{yvalue}`, `${addco}${value}`)
-                            copiedEmbed.content = `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`
-                            copiedEmbed.value = `${addco}${value}`
-                        }
-                        ori = message.channel.send(normalcontent, { embed: normalembed })
-                        normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.value, `{yvalue}`)
-                        startAt++
                         if (endtrue == false) {
                             if (value >= 21) {
                                 responsenow = "s"
@@ -425,6 +430,19 @@ module.exports = async (message, client, options) => {
                                 responsenow = "h"
                             }
                         }
+
+                        if (responsenow != "s") {
+                            if (options.normalEmbed == true) {
+                                normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
+                            } else {
+                                normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.content, `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`).replace(`{yvalue}`, `${addco}${value}`)
+                                copiedEmbed.content = `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`
+                                copiedEmbed.value = `${addco}${value}`
+                            }
+                            ori = message.channel.send({ content: normalcontent, embeds: [normalembed] })
+                            normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.value, `{yvalue}`)
+                        }
+                        startAt++
                     } else if (["e", "end", "en"].includes(theanswer)) {
                         responsenow = "cancel"
                     } else {
@@ -462,7 +480,7 @@ module.exports = async (message, client, options) => {
                 startAt++
             }
             responsenow = "INVALID"
-            
+
             if (value > 21 || (dvalue <= 21 && value < dvalue)) {
                 if (value > 21) {
                     method = "Busted"
@@ -474,7 +492,7 @@ module.exports = async (message, client, options) => {
                 loseembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
                 loseembed.fields[1].value = `Cards: [\`${dealercontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${dvalue}\``
                 if (options.resultEmbed == true) {
-                    message.channel.send({ embed: loseembed })
+                    message.channel.send({ embeds: [loseembed] })
                 }
                 RESULTS = "Lose"
                 if (doubledtrue == true) {
@@ -491,7 +509,7 @@ module.exports = async (message, client, options) => {
                 winembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
                 winembed.fields[1].value = `Cards: [\`${dealercontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${dvalue}\``
                 if (options.resultEmbed == true) {
-                    message.channel.send({ embed: winembed })
+                    message.channel.send({ embeds: [winembed] })
                 }
                 RESULTS = "Win"
                 if (doubledtrue == true) {
@@ -502,7 +520,7 @@ module.exports = async (message, client, options) => {
                 tieembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
                 tieembed.fields[1].value = `Cards: [\`${dealercontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${dvalue}\``
                 if (options.resultEmbed == true) {
-                    message.channel.send({ embed: tieembed })
+                    message.channel.send({ embeds: [tieembed] })
                 }
                 RESULTS = "Tie"
             } else {
@@ -513,17 +531,18 @@ module.exports = async (message, client, options) => {
                     .setFooter("Oops")
                     .setColor("#FF0000")
                 if (options.resultEmbed == true) {
-                    message.channel.send({ embed: errEmbed })
+                    message.channel.send({ embeds: [errEmbed] })
                 }
                 RESULTS = "ERROR"
             }
+            responsenow = "ENDED"
         }
 
 
         while (responsenow == "cancel") {
             games.delete(message.author.id)
             if (options.resultEmbed == true) {
-                message.channel.send({ embed: cancelembed })
+                message.channel.send({ embeds: [cancelembed] })
             }
             responsenow = "INVALID"
             RESULTS = "Cancel"
@@ -532,7 +551,7 @@ module.exports = async (message, client, options) => {
         while (responsenow == "timeout") {
             games.delete(message.author.id)
             if (options.resultEmbed == true) {
-                message.channel.send({ embed: noResEmbed })
+                message.channel.send({ embeds: [noResEmbed] })
             }
             RESULTS = "Timeout"
             responsenow = "INVALID"
