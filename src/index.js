@@ -177,7 +177,14 @@ module.exports = async (message, Discord, options) => {
         let avatar = message.author?.displayAvatarURL() || message.user.displayAvatarURL()
 
         if (normalembed == true) {
-            normalembed = new Discord.MessageEmbed()
+           if (options.buttons == true) {
+               normalembed = new Discord.MessageEmbed()
+                   .setAuthor(usertag, avatar)
+                   .setColor("RANDOM")
+                   .addField(`Your Hand`, `Cards: [\`${yourcontent.join("\`](https://google.com) [\`")}\`](https://google.com)\nTotal: \`${addco}${value}\``, true)
+                   .addField(`${message.client.user.username}'s Hand`, `Cards: [\`${dealerdeck[0].emoji} ${dealerdeck[0].rank}\`](https://google.com) \` ? \`\nTotal: \` ? \``, true)
+                   .setTitle(`Blackjack Game`)
+           } else normalembed = new Discord.MessageEmbed()
                 .setAuthor(usertag, avatar)
                 .setColor("RANDOM")
                 .addField(`Your Hand`, `Cards: [\`${yourcontent.join("\`](https://google.com) [\`")}\`](https://google.com)\nTotal: \`${addco}${value}\``, true)
@@ -224,15 +231,6 @@ module.exports = async (message, Discord, options) => {
             .setTitle(`Game Ended`)
             .setDescription(`**${message.author?.username || message.user.username}, your Game has Ended due to 30 seconds of Inactivity.**`)
             .setColor("RANDOM")
-
-        if (options.buttons == true) {
-            normalembed = new Discord.MessageEmbed()
-                .setAuthor(usertag, avatar)
-                .setColor("RANDOM")
-                .addField(`Your Hand`, `Cards: [\`${yourcontent.join("\`](https://google.com) [\`")}\`](https://google.com)\nTotal: \`${addco}${value}\``, true)
-                .addField(`${message.client.user.username}'s Hand`, `Cards: [\`${dealerdeck[0].emoji} ${dealerdeck[0].rank}\`](https://google.com) \` ? \`\nTotal: \` ? \``, true)
-                .setTitle(`Blackjack Game`)
-        }
 
         let hitButton = new Discord.MessageButton()
             .setLabel("Hit")
