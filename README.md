@@ -1,6 +1,12 @@
 # Discord Blackjack
 Play blackjack on Discord at any time!
 
+## Version 3.0.2 Changelog
+- Fixed stand and double down not working
+
+## Version 3.0.1 Changelog
+- Fixed customEmbeds and normalEmbeds getting mixed up
+
 ## Version 3.0.0 Changelog
 - Added buttons
 - Buttons are now automatically set to true. To set them to false, use the options parameter and write `buttons: false`

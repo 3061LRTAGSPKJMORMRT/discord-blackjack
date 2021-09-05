@@ -3,6 +3,7 @@ const games = new Set();
 
 /** 
     * @param {Discord.Message} message The Message Object sent by the user
+    * @param {Discord} Discord The Discord object
     * @param {object} options The options object (optional)
     * @returns String
     * @async
@@ -46,6 +47,9 @@ module.exports = async (message, Discord, options) => {
     }
     let method = "None"
     if (!message) throw new Error("[DETAILS_NOT_PROVIDED]: The Message Object was not provided!")
+    if (!Discord) throw new Error("[DETAILS_NOT_PROVIDED]: The Discord Object was not provided!")
+    if (!Discord.version) throw new Error("[INVALID_DETAILS]: The Discord Object was invalid!")
+    if (Discord.version.split(".")[0] < "13") throw new TypeError("[WRONG_USAGE]: You need to at least update your discord.js module to version 13.0.0. To keep using v12, downgrade to version 2.0.4 by using `npm install discord-blackjack@2.0.4`")
     if (!options) options = {}
     if (typeof options != "object") throw new Error("[INVALID_DETAILS]: Options is expected to be an object!")
     if (!options.resultEmbed && options.resultEmbed != false) options.resultEmbed = true
@@ -163,12 +167,12 @@ module.exports = async (message, Discord, options) => {
 
         let startAt = 5
 
-        let yourdeck = [NEWDECKS[0], NEWDECKS[2]].sort((a, b) => a.value - b.value)
+        let yourdeck = [NEWDECKS[0], NEWDECKS[2]]
         let yourrank = [NEWDECKS[0].rank, NEWDECKS[2].rank]
         let youremoji = [NEWDECKS[0].emoji, NEWDECKS[2].emoji]
         let yourcontent = [`${NEWDECKS[0].emoji} ${NEWDECKS[0].rank}`, `${NEWDECKS[2].emoji} ${NEWDECKS[2].rank}`]
         let value = NEWDECKS[0].value + NEWDECKS[2].value
-        let dealerdeck = [NEWDECKS[1], NEWDECKS[3]].sort((a, b) => a.value - b.value)
+        let dealerdeck = [NEWDECKS[1], NEWDECKS[3]]
         let dealerrank = [NEWDECKS[1].rank, NEWDECKS[3].rank]
         let dealeremoji = [NEWDECKS[1].emoji, NEWDECKS[3].emoji]
         let dealercontent = [`${NEWDECKS[1].emoji} ${NEWDECKS[1].rank}`, `${NEWDECKS[3].emoji} ${NEWDECKS[3].rank}`]
@@ -176,7 +180,7 @@ module.exports = async (message, Discord, options) => {
         let usertag = message.author?.tag || message.user.tag
         let avatar = message.author?.displayAvatarURL() || message.user.displayAvatarURL()
 
-        if (normalembed == true) {
+        if (options.normalEmbed == true) {
             normalembed = new Discord.MessageEmbed()
                 .setAuthor(usertag, avatar)
                 .setColor("RANDOM")
@@ -226,12 +230,15 @@ module.exports = async (message, Discord, options) => {
             .setColor("RANDOM")
 
         if (options.buttons == true) {
-            normalembed = new Discord.MessageEmbed()
-                .setAuthor(usertag, avatar)
-                .setColor("RANDOM")
-                .addField(`Your Hand`, `Cards: [\`${yourcontent.join("\`](https://google.com) [\`")}\`](https://google.com)\nTotal: \`${addco}${value}\``, true)
-                .addField(`${message.client.user.username}'s Hand`, `Cards: [\`${dealerdeck[0].emoji} ${dealerdeck[0].rank}\`](https://google.com) \` ? \`\nTotal: \` ? \``, true)
-                .setTitle(`Blackjack Game`)
+            if (options.normalEmbed == true) {
+                console.log("i tjink shld work")
+                normalembed = new Discord.MessageEmbed()
+                    .setAuthor(usertag, avatar)
+                    .setColor("RANDOM")
+                    .addField(`Your Hand`, `Cards: [\`${yourcontent.join("\`](https://google.com) [\`")}\`](https://google.com)\nTotal: \`${addco}${value}\``, true)
+                    .addField(`${message.client.user.username}'s Hand`, `Cards: [\`${dealerdeck[0].emoji} ${dealerdeck[0].rank}\`](https://google.com) \` ? \`\nTotal: \` ? \``, true)
+                    .setTitle(`Blackjack Game`)
+            }
         }
 
         let hitButton = new Discord.MessageButton()
@@ -280,7 +287,7 @@ module.exports = async (message, Discord, options) => {
             "hitbtn-discordblackjack", 
             "standbtn-discordblackjack", 
             "ddbtn-discordblackjack", 
-            "standbtn-discordblackjack",
+            "splitbtn-discordblackjack",
             "cancelbtn-discordblackjack"
         ].includes(i.customId) && i.user.id == message.member.id}
 
@@ -313,7 +320,8 @@ module.exports = async (message, Discord, options) => {
                 filter = filter2
                 row.addComponents(doubledownButton)
                 
-            } else if (yourdeck[0].rank == yourdeck[1].rank) {
+            } 
+            if (yourdeck[0].rank == yourdeck[1].rank) {
                 content = split
                 filter = filter3
                 row.addComponents(splitButton)
@@ -400,6 +408,42 @@ module.exports = async (message, Discord, options) => {
                 ).catch(() => {
                     responsenow = "timeout"
                 })
+
+                while (responsenow == "d") {
+                    doubledtrue = true
+                    let dealCard = NEWDECKS[startAt - 1]
+                    yourdeck.push(dealCard)
+                    if (dealCard.rank == "A") {
+                        if (yourrank.includes("A")) {
+                            dealCard.value = 1
+                        } else {
+                            dealCard.value = 11
+                        }
+                    }
+                    yourcontent.push(`${dealCard.emoji} ${dealCard.rank}`)
+                    yourrank.push(dealCard.rank)
+                    youremoji.push(dealCard.emoji)
+                    value = value + dealCard.value
+                    responsenow = "s"
+                }
+
+                while (responsenow == "split") {
+                    let deletedi = yourdeck.pop()
+                    value = value - deletedi.value
+                    yourrank.pop()
+                    youremoji.pop()
+                    yourcontent.pop()
+                    if (options.normalEmbed == true) {
+                        normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
+                    } else {
+                        normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.content, `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`).replace(`{yvalue}`, `${addco}${value}`)
+                        copiedEmbed.content = `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`
+                        copiedEmbed.value = `${addco}${value}`
+                    }
+                    btnmsg = await message.channel.send({ embeds: [normalembed], components: [row, row2] })
+                    normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.value, `{yvalue}`)
+                    responsenow = "h"
+                }
 
                 while (responsenow == "h") {
                     await btnmsg.awaitMessageComponent({ filter: btnfilter, time: 30000 })
@@ -561,41 +605,7 @@ module.exports = async (message, Discord, options) => {
 
                 }
 
-                while (responsenow == "d") {
-                    doubledtrue = true
-                    let dealCard = NEWDECKS[startAt - 1]
-                    yourdeck.push(dealCard)
-                    if (dealCard.rank == "A") {
-                        if (yourrank.includes("A")) {
-                            dealCard.value = 1
-                        } else {
-                            dealCard.value = 11
-                        }
-                    }
-                    yourcontent.push(`${dealCard.emoji} ${dealCard.rank}`)
-                    yourrank.push(dealCard.rank)
-                    youremoji.push(dealCard.emoji)
-                    value = value + dealCard.value
-                    responsenow = "s"
-                }
-
-                while (responsenow == "split") {
-                    let deletedi = yourdeck.pop()
-                    value = value - deletedi.value
-                    yourrank.pop()
-                    youremoji.pop()
-                    yourcontent.pop()
-                    if (options.normalEmbed == true) {
-                        normalembed.fields[0].value = `Cards: [\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)\nTotal: \`${addco}${value}\``
-                    } else {
-                        normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.content, `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`).replace(`{yvalue}`, `${addco}${value}`)
-                        copiedEmbed.content = `[\`${yourcontent.join("`](https://google.com)   [`")}\`](https://google.com)`
-                        copiedEmbed.value = `${addco}${value}`
-                    }
-                    btnmsg = await message.channel.send({ embeds: [normalembed], components: [row, row2] })
-                    normalembed.fields[0].value = normalembed.fields[0].value.replace(copiedEmbed.value, `{yvalue}`)
-                    responsenow = "h"
-                }
+                
 
                 while (responsenow == "cancel") {
                     games.delete(message.member.id)
