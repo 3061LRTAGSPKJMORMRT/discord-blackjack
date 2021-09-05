@@ -231,7 +231,6 @@ module.exports = async (message, Discord, options) => {
 
         if (options.buttons == true) {
             if (options.normalEmbed == true) {
-                console.log("i tjink shld work")
                 normalembed = new Discord.MessageEmbed()
                     .setAuthor(usertag, avatar)
                     .setColor("RANDOM")
