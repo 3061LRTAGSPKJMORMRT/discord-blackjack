@@ -1,5 +1,6 @@
 # Discord Blackjack
 Play blackjack on Discord at any time!
+[![Downloads](https://img.shields.io/npm/dt/discord-blackjack?logo=npm&style=flat-square)](https://npmjs.com/package/discord-blackjack)
 
 ## Version 3.0.2 Changelog
 - Fixed stand and double down not working
