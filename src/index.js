@@ -470,7 +470,7 @@ module.exports = async (message, Discord, options) => {
                                     if (addco == "Soft ") {
                                         addco = ""
                                         for (let usu = 0; usu < yourdeck.length; usu++) {
-                                            if (yourdeck[usu].rank == "A" && yourdeck[e].value == 11) {
+                                            if (yourdeck[usu].rank == "A" && yourdeck[usu].value == 11) {
                                                 yourdeck[usu].value = 1
                                                 value = value - 10
                                             }
@@ -655,7 +655,7 @@ module.exports = async (message, Discord, options) => {
                                     if (addco == "Soft ") {
                                         addco = ""
                                         for (let e = 0; e < yourdeck.length; e++) {
-                                            if (yourdeck[e].rank == "A") {
+                                            if (yourdeck[e].rank == "A" && yourdeck[e].value == 11) {
                                                 yourdeck[e].value = 1
                                                 value = value - 10
                                             }
@@ -767,7 +767,7 @@ module.exports = async (message, Discord, options) => {
                                 if (addco == "Soft ") {
                                     addco = ""
                                     for (let usu = 0; usu < yourdeck.length; usu++) {
-                                        if (yourdeck[usu].rank == "A") {
+                                        if (yourdeck[usu].rank == "A" && yourdeck[usu].value == 11) {
                                             yourdeck[usu].value = 1
                                             value = value - 10
                                         }
