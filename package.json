@@ -1,6 +1,6 @@
 {
   "name": "discord-blackjack",
-  "version": "3.0.2",
+  "version": "4.0.0",
   "description": "A blackjack game for Discord",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,7 @@
   "author": "Ashish Emmanuel",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^13.1.0",
+    "discord.js": "^13.6.0",
     "shuffle-array": "^1.0.1"
   }
 }
