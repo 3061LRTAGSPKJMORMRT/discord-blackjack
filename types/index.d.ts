@@ -1,9 +1,9 @@
-export { Message, CommandInteraction, MessageEmbed } from "discord.js"
+import { Message, CommandInteraction, MessageEmbed } from "discord.js"
 
 declare module "discord-blackjack" {
     export function Main(message: Message | CommandInteraction, options?: MainOptions): Promise<FinalResult>
 
-    declare interface MainOptions {
+    interface MainOptions {
         transition?: "edit" | "delete"
         buttons?: boolean
         doubledown?: boolean
@@ -14,14 +14,14 @@ declare module "discord-blackjack" {
         emojis?: OptionEmojis
     }
 
-    declare interface OptionEmojis {
+    interface OptionEmojis {
         clubs: string | "♣️"
         spades: string | "♠️"
         hearts: string | "♥️"
         diamonds: string | "♦️"
     }
 
-    declare interface FinalResult {
+    interface FinalResult {
         result: string
         method: string
         ycard: Array<Card>
@@ -29,7 +29,7 @@ declare module "discord-blackjack" {
         message?: Message
     }
 
-    declare interface Card {
+    interface Card {
         suit: string
         rank: string
         value: number
