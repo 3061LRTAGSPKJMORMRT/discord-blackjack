@@ -44,6 +44,7 @@ module.exports = async (message, options) => {
     options.transition === "edit" ? options.transition = "edit" : options.transition = "delete" // how they want the embeds to be transitioned
     options.buttons === false ? options.buttons = false : options.buttons = true // check if buttons were enabled
     options.doubledown === false ? options.doubledown = false : options.doubledown = true // check if double down should appear
+    options.insurance === false ? options.insurance = false : options.insurance = true // check if double down should appear
     options.split === false ? options.split = false : options.split = true // check if split should appear
     options.resultEmbed === false ? options.resultEmbed = false : options.resultEmbed = true // check if the result embed should be displayed
     options.normalEmbed === false ? options.normalEmbed = false : options.normalEmbed = true // check if they want the default embed when playing
@@ -118,6 +119,7 @@ module.exports = async (message, options) => {
     let transition = options.transition
     let buttons = options.buttons 
     let doubledown = options.doubledown
+    let insurance = options.insurance
     let split = options.split
     let resultEmbed = options.resultEmbed
     let normalEmbed = options.normalEmbed
@@ -192,6 +194,8 @@ module.exports = async (message, options) => {
     let standbtn = { label: "Stand", style: 1, custom_id: "discord-blackjack-standbtn", type: 2 }
     let ddownbtn = { label: "Double Down", style: 1, custom_id: "discord-blackjack-ddownbtn", type: 2 }
     let splitbtn = { label: "Split", style: 1, custom_id: "discord-blackjack-splitbtn", type: 2 }
+    let insbtn = { label: "Insurance", style: 1, custom_id: "discord-blackjack-insbtn", type: 2 }
+    let noinsbtn = { label: "No Insurance", style: 4, custom_id: "discord-blackjack-noinsbtn", type: 2 }
     let cancelbtn = { label: "Cancel", style: 4, custom_id: "discord-blackjack-cancelbtn", type: 2 }
 
     let row1 = { type: 1, components: [hitbtn, standbtn] }
@@ -204,17 +208,42 @@ module.exports = async (message, options) => {
     shuffle(DECK)
 
     let currentDeck = DECK
-
+    let testDeck = [
+        { suit: 'spades', rank: '5', value: 5, emoji: options.emojis.spades },
+        { suit: 'spades', rank: '5', value: 5, emoji: options.emojis.spades },
+        ]
+    let testDeck2 = [
+        { suit: 'spades', rank: 'A', value: [1, 11], emoji: options.emojis.spades },
+        { suit: 'spades', rank: '10', value: 10, emoji: options.emojis.spades },
+        ]
+    // shuffle(testDeck)
+    // shuffle(testDeck2)
     let yourcards = [currentDeck.pop(), currentDeck.pop()]
+        // let yourcards = [testDeck[0],testDeck[1]]
+
     let dealercards = [currentDeck.pop(), currentDeck.pop()]
+        // let dealercards = [testDeck2[0],testDeck2[1]]
 
     // set the embeds
-    let winEmbed = { title: "You won!", color: 0x008800, description: "", fields: [], author: { name: message.member.user.tag, icon_url: message.member.user.displayAvatarURL() } }
-    let loseEmbed = { title: "You lost!", color: 0xFF0000, description: "", fields: [], author: { name: message.member.user.tag, icon_url: message.member.user.displayAvatarURL() } }
-    let tieEmbed = { title: "It's a tie", color: 0xFFFF00, description: "", fields: [], author: { name: message.member.user.tag, icon_url: message.member.user.displayAvatarURL() } }
+    let winEmbed = { title: "You won!", color: 0x008800, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let loseEmbed = { title: "You lost!", color: 0xFF0000, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let tieEmbed = { title: "It's a tie.", color: 0xFFFF00, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let splitWinEmbed = { title: "You split and won both hands!", color: 0x008800, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let splitLoseEmbed = { title: "You split and lost both hands!", color: 0xFF0000, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let splitTieEmbed = { title: "You split and tied both hands!", color: 0xFFFF00, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let splitTieWinEmbed = { title: "You split: First hand ties and second hand wins.", color: 0x008800, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let splitWinTieEmbed = { title: "You split: First hand wins and second hand ties.", color: 0x008800, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let splitTieLoseEmbed = { title: "You split: First hand ties and second hand loses.", color: 0xFF0000, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let splitLoseTieEmbed = { title: "You split: First hand loses and second hand ties.", color: 0xFF0000, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let splitWinLoseEmbed = { title: "You split: First hand wins and second hand loses.", color: 0xFFFF00, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let splitLoseWinEmbed = { title: "You split: First hand loses and second hand wins.", color: 0xFFFF00, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let insWinEmbed = { title: "You won (paid insurance)!", color: 0x008800, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let insLoseEmbed = { title: "You lost (paid insurance)!", color: 0xFF0000, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let insTieEmbed = { title: "It's a tie (paid insurance).", color: 0xFF0000, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
+    let insPayEmbed = { title: "Insurance Payout!", color: 0x008800, description: "", fields: [], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
     let timeoutEmbed = { title: "Time's up!", color: 0xFF0000, description: "You took more than 30 seconds to respond. The time is up and the game has canceled.", fields: [], author: { name: message.member.user.tag, icon_url: message.member.displayAvatarURL() } } 
-    let cancelEmbed = { title: "Game canceled", color: 0xFF0000, description: "You decided to cancel your ongoing blackjack game.", fields: [], author: { name: message.member.user.tag, icon_url: message.member.displayAvatarURL() } }
-    let generalEmbed = normalEmbed === false ? options.normalEmbedContent : { title: "Blackjack", color: Math.floor(Math.random() * (0xffffff + 1)), fields: [{ name: "Your hand", value: "", inline: true }, { name: `${message.client.user.username}'s hand`, value: "", inline: true }], author: { name: message.member.user.tag, icon_url: message.member.user.displayAvatarURL() } }
+    let cancelEmbed = { title: "Game canceled.", color: 0xFF0000, description: "You decided to cancel your ongoing blackjack game.", fields: [], author: { name: message.member.displayName, icon_url: message.member.displayAvatarURL() } }
+    let generalEmbed = normalEmbed === false ? options.normalEmbedContent : { title: "Blackjack", color: Math.floor(Math.random() * (0xffffff + 1)), fields: [{ name: "Your hand", value: "", inline: true }, { name: `Dealer's hand`, value: "", inline: true }], author: { name: message.member.displayName, icon_url: message.member.user.displayAvatarURL() } }
 
     // set the filters
     let allFilter = ["h", "hit", "s", "stand", "cancel"]
@@ -229,6 +258,15 @@ module.exports = async (message, options) => {
         yourcards[1].value = 11
     }
 
+    if (dealercards[0].rank === dealercards[1].rank && dealercards[0].rank === "A") {
+        dealercards[0].value = 11
+        dealercards[1].value = 1
+        isSoft = true
+    } else if (dealercards[0].rank === "A") {
+        dealercards[0].value = 11 
+    } else if (dealercards[1].rank === "A") {
+        dealercards[1].value = 11
+    }
 
     if (yourcards.map(c => c.rank).includes("A")) isSoft = true
 
@@ -236,18 +274,16 @@ module.exports = async (message, options) => {
     generalEmbed.fields[1].value = `Cards: [\`${dealercards[0].emoji} ${dealercards[0].rank}\`](https://google.com) \` ? \`\nTotal: \` ? \``
 
     options.embed = generalEmbed
-
+    let yourvalue = yourcards.map(c => c.value).reduce((a, b) => b+a)
+    let dealervalue = dealercards.map(c => c.value).reduce((a, b) => b+a)
+    
     // check if we can do double down
-    if (!yourcards.map(a => a.rank).includes("A") && doubledown === true) {
-        if (yourcards.map(a => a.value).reduce((a, b) => b + a) === 9) {
+    if (doubledown === true) {
+        if (yourcards.map(a => a.value).reduce((a, b) => b + a) === 9 || (yourcards.map(a => a.value).reduce((a, b) => b+a) === 10 || yourcards.map(a => a.value).reduce((a, b) => b+a) === 11)) {
             row1.components.push(ddownbtn)
             allFilter.push("d")
             allFilter.push("doubledown")
-        } else if ((yourcards.map(a => a.value).reduce((a, b) => b+a) === 10 || yourcards.map(a => a.value).reduce((a, b) => b+a) === 11) && dealercards.map(a => a.value).reduce((a, b) => b+a) < 10) {
-            row1.components.push(ddownbtn)
-            allFilter.push("d")
-            allFilter.push("doubledown")
-        }
+        } 
     }
 
     // check if we can do split
@@ -255,20 +291,64 @@ module.exports = async (message, options) => {
         row1.components.push(splitbtn)
         allFilter.push("split")
     }
+
+    // check if we offer insurance
+    if (dealercards[0].rank === "A" && insurance === true) {
+        if (yourvalue != 21) {
+            row1.components = []
+            row1.components.push(insbtn)
+            row1.components.push(noinsbtn)
+            allFilter.push("i")
+            allFilter.push("insurance")
+            allFilter.push("ni")
+            allFilter.push("noinsurance")
+        } 
+    }
     
     // start the game
-
-    if (yourcards.map(c => c.value).reduce((a, b) => b+a) === 21) {
+    if (yourvalue === 21 && dealervalue != 21) {
         if (options.resultEmbed === true) {
-            winEmbed.description = "You had blackjack"
-            winEmbed.fields.push({ name: "Your hand", value: `Cards: [\`${yourcards[0].emoji} ${yourcards[0].rank}\`](https://google.com) [\`${yourcards[1].emoji} ${yourcards[1].rank}\`](https://google.com)\nTotal: 21` })
-            winEmbed.fields.push({ name: "Dealer's hand", value: `Card: [\`${dealercards[0].emoji} ${dealercards[0].rank}\`](https://google.com)\nTotal: \` ? \`` })
+            winEmbed.description = "You won with blackjack."
+            winEmbed.fields.push({ name: "Your hand", value: `Cards: [\`${yourcards[0].emoji} ${yourcards[0].rank}\`](https://google.com) [\`${yourcards[1].emoji} ${yourcards[1].rank}\`](https://google.com)\nTotal: ${yourvalue}` })
+            winEmbed.fields.push({ name: "Dealer's hand", value: `Card: [\`${dealercards[0].emoji} ${dealercards[0].rank}\`](https://google.com) [\`${dealercards[1].emoji} ${dealercards[1].rank}\`](https://google.com)\nTotal: ${dealervalue}` })
             commandType === "message" ? message.channel.send({ embeds: [winEmbed] }) : message.channel.send({ embeds: [winEmbed] })
         }
 
         return {
-            result: "WIN",
-            method: "You had blackjack",
+            result: "BLACKJACK",
+            method: "You won with blackjack.",
+            ycard: yourcards,
+            dcard: dealercards
+        }
+    }
+
+    // else if (dealervalue === 21 && yourvalue != 21) {
+    //     if (options.resultEmbed === true) {
+    //         loseEmbed.description = "You lost (dealer had blackjack)."
+    //         loseEmbed.fields.push({ name: "Your hand", value: `Cards: [\`${yourcards[0].emoji} ${yourcards[0].rank}\`](https://google.com) [\`${yourcards[1].emoji} ${yourcards[1].rank}\`](https://google.com)\nTotal: ${yourvalue}` })
+    //         loseEmbed.fields.push({ name: "Dealer's hand", value: `Cards: [\`${dealercards[0].emoji} ${dealercards[0].rank}\`](https://google.com) [\`${dealercards[1].emoji} ${dealercards[1].rank}\`](https://google.com)\nTotal: ${dealervalue}` })
+    //         commandType === "message" ? message.channel.send({ embeds: [loseEmbed] }) : message.channel.send({ embeds: [loseEmbed] })
+    //     }
+
+    //     return {
+    //         result: "LOSE",
+    //         method: "You lost (dealer had blackjack).",
+    //         ycard: yourcards,
+    //         dcard: dealercards
+    //     }
+    // }
+
+    else if (dealervalue === 21 && dealervalue == yourvalue) {
+        if (options.resultEmbed === true) {
+            tieEmbed.description = "You tied (both had blackjack)."
+            tieEmbed.fields.push({ name: "Your hand", value: `Cards: [\`${yourcards[0].emoji} ${yourcards[0].rank}\`](https://google.com) [\`${yourcards[1].emoji} ${yourcards[1].rank}\`](https://google.com)\nTotal: ${yourvalue}` })
+            tieEmbed.fields.push({ name: "Dealer's hand", value: `Cards: [\`${dealercards[0].emoji} ${dealercards[0].rank}\`](https://google.com) [\`${dealercards[1].emoji} ${dealercards[1].rank}\`](https://google.com)\nTotal: ${dealervalue}` })
+            commandType === "message" ? message.channel.send({ embeds: [tieEmbed] }) : message.channel.send({ embeds: [tieEmbed] })
+        }
+
+        return {
+            result: "TIE",
+            method: "You tied (both had blackjack).",
             ycard: yourcards,
             dcard: dealercards
         }
@@ -289,11 +369,80 @@ module.exports = async (message, options) => {
         
         let resultingEmbed = {
             "WIN": winEmbed,
+            "BLACKJACK": winEmbed,
             "LOSE": loseEmbed,
             "TIE": tieEmbed,
             "DOUBLE WIN": winEmbed,
             "DOUBLE LOSE": loseEmbed,
             "DOUBLE TIE": tieEmbed,
+            "SPLIT WIN-LOSE": splitWinLoseEmbed,
+            "SPLIT LOSE-WIN": splitLoseWinEmbed,
+            "SPLIT TIE-TIE": splitTieEmbed,
+            "SPLIT WIN-WIN": splitWinEmbed,
+            "SPLIT LOSE-LOSE": splitLoseEmbed,
+            "SPLIT TIE-WIN": splitTieWinEmbed,
+            "SPLIT WIN-TIE": splitWinTieEmbed,
+            "SPLIT TIE-LOSE": splitTieLoseEmbed,
+            "SPLIT LOSE-TIE": splitLoseTieEmbed,
+            "SPLIT BLACKJACK-WIN": splitWinEmbed,
+            "SPLIT WIN-BLACKJACK": splitWinEmbed,
+            "SPLIT BLACKJACK-LOSE": splitWinLoseEmbed,
+            "SPLIT LOSE-BLACKJACK": splitLoseWinEmbed,
+            "SPLIT BLACKJACK-BLACKJACK": splitWinEmbed,
+            "SPLIT BLACKJACK-TIE": splitWinTieEmbed,
+            "SPLIT TIE-BLACKJACK": splitTieWinEmbed,
+            "SPLIT DOUBLE WIN-LOSE": splitWinLoseEmbed,
+            "SPLIT DOUBLE LOSE-WIN": splitLoseWinEmbed,
+            "SPLIT DOUBLE TIE-TIE": splitTieEmbed,
+            "SPLIT DOUBLE WIN-WIN": splitWinEmbed,
+            "SPLIT DOUBLE LOSE-LOSE": splitLoseEmbed,
+            "SPLIT DOUBLE TIE-WIN": splitTieWinEmbed,
+            "SPLIT DOUBLE WIN-TIE": splitWinTieEmbed,
+            "SPLIT DOUBLE TIE-LOSE": splitTieLoseEmbed,
+            "SPLIT DOUBLE LOSE-TIE": splitLoseTieEmbed,
+            "SPLIT DOUBLE BLACKJACK-WIN": splitWinEmbed,
+            "SPLIT DOUBLE WIN-BLACKJACK": splitWinEmbed,
+            "SPLIT DOUBLE BLACKJACK-LOSE": splitWinLoseEmbed,
+            "SPLIT DOUBLE LOSE-BLACKJACK": splitLoseWinEmbed,
+            "SPLIT DOUBLE BLACKJACK-BLACKJACK": splitWinEmbed,
+            "SPLIT DOUBLE BLACKJACK-TIE": splitWinTieEmbed,
+            "SPLIT DOUBLE TIE-BLACKJACK": splitTieWinEmbed,
+            "SPLIT WIN-DOUBLE LOSE": splitWinLoseEmbed,
+            "SPLIT LOSE-DOUBLE WIN": splitLoseWinEmbed,
+            "SPLIT TIE-DOUBLE TIE": splitTieEmbed,
+            "SPLIT WIN-DOUBLE WIN": splitWinEmbed,
+            "SPLIT LOSE-DOUBLE LOSE": splitLoseEmbed,
+            "SPLIT TIE-DOUBLE WIN": splitTieWinEmbed,
+            "SPLIT WIN-DOUBLE TIE": splitWinTieEmbed,
+            "SPLIT TIE-DOUBLE LOSE": splitTieLoseEmbed,
+            "SPLIT LOSE-DOUBLE TIE": splitLoseTieEmbed,
+            "SPLIT BLACKJACK-DOUBLE WIN": splitWinEmbed,
+            "SPLIT WIN-DOUBLE BLACKJACK": splitWinEmbed,
+            "SPLIT BLACKJACK-DOUBLE LOSE": splitWinLoseEmbed,
+            "SPLIT LOSE-DOUBLE BLACKJACK": splitLoseWinEmbed,
+            "SPLIT BLACKJACK-DOUBLE BLACKJACK": splitWinEmbed,
+            "SPLIT BLACKJACK-DOUBLE TIE": splitWinTieEmbed,
+            "SPLIT TIE-DOUBLE BLACKJACK": splitTieWinEmbed,
+            "SPLIT DOUBLE WIN-DOUBLE LOSE": splitWinLoseEmbed,
+            "SPLIT DOUBLE LOSE-DOUBLE WIN": splitLoseWinEmbed,
+            "SPLIT DOUBLE TIE-DOUBLE TIE": splitTieEmbed,
+            "SPLIT DOUBLE WIN-DOUBLE WIN": splitWinEmbed,
+            "SPLIT DOUBLE LOSE-DOUBLE LOSE": splitLoseEmbed,
+            "SPLIT DOUBLE TIE-DOUBLE WIN": splitTieWinEmbed,
+            "SPLIT DOUBLE WIN-DOUBLE TIE": splitWinTieEmbed,
+            "SPLIT DOUBLE TIE-DOUBLE LOSE": splitTieLoseEmbed,
+            "SPLIT DOUBLE LOSE-DOUBLE TIE": splitLoseTieEmbed,
+            "SPLIT DOUBLE BLACKJACK-DOUBLE WIN": splitWinEmbed,
+            "SPLIT DOUBLE WIN-DOUBLE BLACKJACK": splitWinEmbed,
+            "SPLIT DOUBLE BLACKJACK-DOUBLE LOSE": splitWinLoseEmbed,
+            "SPLIT DOUBLE LOSE-DOUBLE BLACKJACK": splitLoseWinEmbed,
+            "SPLIT DOUBLE BLACKJACK-DOUBLE BLACKJACK": splitWinEmbed,
+            "SPLIT DOUBLE BLACKJACK-DOUBLE TIE": splitWinTieEmbed,
+            "SPLIT DOUBLE TIE-DOUBLE BLACKJACK": splitTieWinEmbed,
+            "INSURANCE PAYOUT": insPayEmbed,
+            "INSURANCE WIN": insWinEmbed,
+            "INSURANCE LOSE": insLoseEmbed,
+            "INSURANCE TIE": insTieEmbed,
             "CANCEL": cancelEmbed,
             "TIMEOUT": timeoutEmbed
         }
@@ -303,12 +452,13 @@ module.exports = async (message, options) => {
             finalEmbed.description = finalResult.method
         }
         finalEmbed.fields.push({ name: `Your hand`, value: `Cards: ${finalResult.ycard.map(c => `[\`${c.emoji} ${c.rank}\`](https://google.com)`).join(" ")}\nTotal: ${finalResult.ycard.map(card => card.value).reduce((a, b) => b+a)}`, inline: true })
-        finalEmbed.fields.push({ name: `${message.client.user.username}'s hand`, value: `Cards: ${finalResult.dcard.map(c => `[\`${c.emoji} ${c.rank}\`](https://google.com)`).join(" ")}\nTotal: ${finalResult.dcard.map(card => card.rank === "A" ? 1 : card.value).reduce((a, b) => b+a)}`, inline: true })
-        
+                if (finalResult.ycard2 != null) {
+            finalEmbed.fields.push({ name: `Your 2nd hand`, value: `Cards: ${finalResult.ycard2.map(c => `[\`${c.emoji} ${c.rank}\`](https://google.com)`).join(" ")}\nTotal: ${finalResult.ycard2.map(card => card.value).reduce((a, b) => b+a)}`, inline: true })
+        }
+        finalEmbed.fields.push({ name: `${message.client.user.username}'s hand`, value: `Cards: ${finalResult.dcard.map(c => `[\`${c.emoji} ${c.rank}\`](https://google.com)`).join(" ")}\nTotal: ${finalResult.dcard.map(card => card.value).reduce((a, b) => b+a)}`, inline: true })
         options.commandType === "message" ? message.channel.send({ embeds: [finalEmbed] }) : message.channel.send({ embeds: [finalEmbed] })
         
         
     }
     return finalResult;
-    
 }
