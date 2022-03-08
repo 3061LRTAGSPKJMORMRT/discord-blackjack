@@ -68,16 +68,16 @@ module.exports = async (message, options) => {
     options.commandType = commandType
 
     // check if options is an object
-    if (options && !(options instanceof Object)) throw new Error(`[INVALID_PARAMETER] The options parameter expected an object, but recieved ${Array.isArray(options) ? "array" : typeof options }`)
+    if (options && !(options instanceof Object)) throw new Error(`[INVALID_PARAMETER] The options parameter expected an object, but received ${Array.isArray(options) ? "array" : typeof options }`)
 
     // check if the emojis option is an object
-    if (typeof options.emojis !== "object") throw new Error(`[INVALID_PARAMETER] The options.emojis parameter expected an object, but recieved ${typeof options}.`)
+    if (typeof options.emojis !== "object") throw new Error(`[INVALID_PARAMETER] The options.emojis parameter expected an object, but received ${typeof options}.`)
 
     // check if the properties for the options.emojis object are strings.
-    if (typeof options.emojis.spades !== "string") throw new Error(`[INVALID_PARAMETER] The emojis.spades option expected a string, but recieved ${typeof options.emojis.spades}`)
-    if (typeof options.emojis.hearts !== "string") throw new Error(`[INVALID_PARAMETER] The emojis.hearts option expected a string, but recieved ${typeof options.emojis.hearts}`)
-    if (typeof options.emojis.diamonds !== "string") throw new Error(`[INVALID_PARAMETER] The emojis.diamonds option expected a string, but recieved ${typeof options.emojis.diamonds}`)
-    if (typeof options.emojis.clubs !== "string") throw new Error(`[INVALID_PARAMETER] The emojis.clubs option expected a string, but recieved ${typeof options.emojis.clubs}`)
+    if (typeof options.emojis.spades !== "string") throw new Error(`[INVALID_PARAMETER] The emojis.spades option expected a string, but received ${typeof options.emojis.spades}`)
+    if (typeof options.emojis.hearts !== "string") throw new Error(`[INVALID_PARAMETER] The emojis.hearts option expected a string, but received ${typeof options.emojis.hearts}`)
+    if (typeof options.emojis.diamonds !== "string") throw new Error(`[INVALID_PARAMETER] The emojis.diamonds option expected a string, but received ${typeof options.emojis.diamonds}`)
+    if (typeof options.emojis.clubs !== "string") throw new Error(`[INVALID_PARAMETER] The emojis.clubs option expected a string, but received ${typeof options.emojis.clubs}`)
 
     // check if the normalEmbed option was set to false but normalEmbedContent was not provided
     if (options.normalEmbed === false && !options.normalEmbedContent) throw new Error("[MISSING_PARAMETER] The normalEmbedContent option was not provided, was null or undefined when normalEmbed was set to false.")
